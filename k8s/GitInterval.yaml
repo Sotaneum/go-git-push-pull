@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: git-interval
+  labels:
+    app: git-interval
+spec:
+  selector:
+    matchLabels:
+      app: git-interval
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: git-interval
+    spec:
+      containers:
+        - name: git-interval
+          image: sotaneum/go-git-push-pull:latest
+          imagePullPolicy: Always
+          env:
+            - name: url
+              value: "https://github.com/Sotaneum/go-git-push-pull.git"
+            - name: remoteName
+              value: "origin"
+            - name: targetFolder
+              value: "/usr/share/git-interval-data"
+            - name: accessToken
+              value: ""
+            - name: intervalMinute
+              value: "10"
+            - name: gitUserName
+              value: ""
+            - name: gitUserEmail
+              value: ""
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - mountPath: "/usr/share/git-interval-data"
+              name: git-interval-data
+      volumes:
+        - name: git-interval-data
+          persistentVolumeClaim:
+            claimName: git-interval-data-pvc
